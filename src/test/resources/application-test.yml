@@ -1,0 +1,50 @@
+server:
+  port: 0
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:calificacion_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+  kafka:
+    bootstrap-servers: localhost:9092
+    listener:
+      auto-startup: false
+
+crm:
+  servicios:
+    clientes:
+      url: http://localhost:8082
+    vehiculos:
+      url: http://localhost:8083
+  kafka:
+    topicos:
+      preformulario-completado: preformulario-completado
+      lead-calificado: lead-calificado
+      preformulario-dlt: preformulario-completado-dlt
+  reglas:
+    puntos:
+      cobertura-alta: 60
+      cobertura-media: 35
+      cobertura-baja: 20
+      financiacion-buena: 20
+      financiacion-mala: -25
+      ubicacion-fuera-zona: -25
+    umbrales:
+      cobertura-alta-pct: 50.0
+      cobertura-media-pct: 20.0
+      nivel-muy-potable: 60
+      nivel-potable: 20
+    zonas-admitidas:
+      - BUENOS_AIRES
+      - CABA
+      - BSAS
+      - BS_AS
+      - GBA
+      - CIUDAD_AUTONOMA_DE_BUENOS_AIRES
+      - PROVINCIA_DE_BUENOS_AIRES

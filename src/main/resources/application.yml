@@ -1,0 +1,75 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: calificacion-service
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/calificacion_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: calificacion-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+# Configuración del ecosistema CRM
+crm:
+  servicios:
+    clientes:
+      url: ${CLIENTES_SERVICE_URL:http://localhost:8082}
+    vehiculos:
+      url: ${VEHICULOS_SERVICE_URL:http://localhost:8083}
+  kafka:
+    topicos:
+      preformulario-completado: preformulario-completado
+      lead-calificado: lead-calificado
+      preformulario-dlt: preformulario-completado-dlt
+  reglas:
+    puntos:
+      cobertura-alta: 60
+      cobertura-media: 35
+      cobertura-baja: 20
+      financiacion-buena: 20
+      financiacion-mala: -25
+      ubicacion-fuera-zona: -25
+    umbrales:
+      cobertura-alta-pct: 50.0
+      cobertura-media-pct: 20.0
+      nivel-muy-potable: 60
+      nivel-potable: 20
+    zonas-admitidas:
+      - BUENOS_AIRES
+      - CABA
+      - BSAS
+      - BS_AS
+      - GBA
+      - CIUDAD_AUTONOMA_DE_BUENOS_AIRES
+      - PROVINCIA_DE_BUENOS_AIRES
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
