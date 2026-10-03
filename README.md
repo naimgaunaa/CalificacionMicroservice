@@ -6,7 +6,7 @@ Microservicio responsable del scoring y calificación crediticia y operativa de 
 
 ---
 
-## 🛠️ Stack Tecnológico
+## Stack Tecnológico
 - **Java 21**
 - **Spring Boot 3.3.4**
   - Spring Web (MVC)
@@ -21,7 +21,7 @@ Microservicio responsable del scoring y calificación crediticia y operativa de 
 
 ---
 
-## 🏛️ Arquitectura Hexagonal
+## Arquitectura Hexagonal
 
 ```
 com.uade.crm.calificacion
@@ -51,7 +51,7 @@ com.uade.crm.calificacion
 
 ---
 
-## 📐 Reglas de Negocio y Scoring
+## Reglas de Negocio y Scoring
 
 El motor evalúa 3 reglas principales (Strategy):
 
@@ -80,7 +80,7 @@ El motor evalúa 3 reglas principales (Strategy):
 
 ---
 
-## 🚀 Endpoints REST (Puerto 8084)
+## Endpoints REST (Puerto 8084)
 
 | Método | Endpoint | Descripción |
 |---|---|---|
@@ -92,7 +92,7 @@ El motor evalúa 3 reglas principales (Strategy):
 
 ---
 
-## 📨 Integración Kafka
+## Integración Kafka
 
 - **Tópico de Entrada**: `preformulario-completado`
   - Escuchado por `PreformularioCompletadoListener`.
@@ -103,7 +103,7 @@ El motor evalúa 3 reglas principales (Strategy):
 
 ---
 
-## 🧪 Pruebas Unitarias
+## Pruebas Unitarias
 
 Para ejecutar la suite de pruebas:
 
