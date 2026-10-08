@@ -51,7 +51,7 @@ com.uade.crm.calificacion
 
 ---
 
-## 🧩 Patrones de Diseño Implementados
+## Patrones de Diseño Implementados
 
 El microservicio implementa **5 patrones de diseño orientados a objetos**, superando el mínimo requerido por la consigna del TPO:
 
