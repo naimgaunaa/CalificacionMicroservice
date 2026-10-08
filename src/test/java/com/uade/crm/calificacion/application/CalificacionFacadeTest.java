@@ -24,6 +24,7 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -66,18 +67,22 @@ class CalificacionFacadeTest {
     @Test
     @DisplayName("Debe calificar lead consultando precio vehicular y situacion crediticia por puertos externos")
     void calificarLead_conConsultaPuertosExternos() {
+        String leadId = UUID.randomUUID().toString();
+        String clienteId = UUID.randomUUID().toString();
+        String vehiculoId = UUID.randomUUID().toString();
+
         PreformularioCompletadoEvent event = PreformularioCompletadoEvent.builder()
-                .leadId(101L)
-                .clienteId(501L)
-                .vehiculoId(2001L)
+                .leadId(leadId)
+                .clienteId(clienteId)
+                .vehiculoId(vehiculoId)
                 .montoAnticipo(BigDecimal.valueOf(5_000_000))
                 .montoPermuta(BigDecimal.ZERO)
                 .solicitaFinanciacion(true)
                 .ubicacion("BUENOS_AIRES")
                 .build();
 
-        when(vehiculosPort.obtenerPrecioVehiculo(2001L)).thenReturn(Optional.of(BigDecimal.valueOf(10_000_000)));
-        when(situacionCrediticiaPort.obtenerSituacionCrediticia(501L)).thenReturn(Optional.of(1));
+        when(vehiculosPort.obtenerPrecioVehiculo(vehiculoId)).thenReturn(Optional.of(BigDecimal.valueOf(10_000_000)));
+        when(situacionCrediticiaPort.obtenerSituacionCrediticia(clienteId)).thenReturn(Optional.of(1));
         when(persistencePort.guardar(any(Calificacion.class))).thenAnswer(invocation -> {
             Calificacion c = invocation.getArgument(0);
             c.setId(99L);
@@ -88,7 +93,8 @@ class CalificacionFacadeTest {
 
         assertThat(resultado).isNotNull();
         assertThat(resultado.getId()).isEqualTo(99L);
-        assertThat(resultado.getLeadId()).isEqualTo(101L);
+        assertThat(resultado.getLeadId()).isEqualTo(leadId);
+        assertThat(resultado.getClienteId()).isEqualTo(clienteId);
         assertThat(resultado.getPuntos()).isEqualTo(80);
         assertThat(resultado.getNivel()).isEqualTo(NivelCalificacion.MUY_POTABLE);
         assertThat(resultado.getOrigen()).isEqualTo(OrigenCalificacion.AUTOMATICA);
@@ -101,7 +107,7 @@ class CalificacionFacadeTest {
     @Test
     @DisplayName("Debe registrar corrección manual con nivel y motivos personalizados")
     void corregirManualmente_debeGuardarYPublicar() {
-        Long leadId = 202L;
+        String leadId = UUID.randomUUID().toString();
         CorreccionManualRequest request = CorreccionManualRequest.builder()
                 .nuevoNivel(NivelCalificacion.MUY_POTABLE)
                 .puntos(90)
@@ -109,6 +115,7 @@ class CalificacionFacadeTest {
                 .usuario("gerente_ventas")
                 .build();
 
+        when(persistencePort.buscarUltimaPorLeadId(leadId)).thenReturn(Optional.empty());
         when(persistencePort.guardar(any(Calificacion.class))).thenAnswer(invocation -> {
             Calificacion c = invocation.getArgument(0);
             c.setId(105L);
@@ -119,7 +126,7 @@ class CalificacionFacadeTest {
 
         assertThat(resultado).isNotNull();
         assertThat(resultado.getId()).isEqualTo(105L);
-        assertThat(resultado.getLeadId()).isEqualTo(202L);
+        assertThat(resultado.getLeadId()).isEqualTo(leadId);
         assertThat(resultado.getNivel()).isEqualTo(NivelCalificacion.MUY_POTABLE);
         assertThat(resultado.getPuntos()).isEqualTo(90);
         assertThat(resultado.getOrigen()).isEqualTo(OrigenCalificacion.MANUAL);

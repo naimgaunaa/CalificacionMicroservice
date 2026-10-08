@@ -2,7 +2,6 @@ package com.uade.crm.calificacion.infrastructure.client;
 
 import com.uade.crm.calificacion.domain.port.VehiculosPort;
 import com.uade.crm.calificacion.infrastructure.client.dto.VehiculoClientResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
@@ -23,8 +22,8 @@ public class VehiculosRestClientAdapter implements VehiculosPort {
     }
 
     @Override
-    public Optional<BigDecimal> obtenerPrecioVehiculo(Long vehiculoId) {
-        if (vehiculoId == null) {
+    public Optional<BigDecimal> obtenerPrecioVehiculo(String vehiculoId) {
+        if (vehiculoId == null || vehiculoId.isBlank()) {
             return Optional.empty();
         }
 

@@ -36,22 +36,22 @@ public class CalificacionFacade {
 
     @Transactional
     public Calificacion calificarLead(PreformularioCompletadoEvent event) {
-        if (event == null || event.getLeadId() == null) {
+        if (event == null || event.getLeadId() == null || event.getLeadId().isBlank()) {
             throw new IllegalArgumentException("El evento de preformulario y el leadId son obligatorios");
         }
 
-        log.info("Iniciando proceso de calificación para leadId: {}", event.getLeadId());
+        log.info("Iniciando proceso de calificación para leadId: {} (clienteId: {})", event.getLeadId(), event.getClienteId());
 
         // 1. Resolver precio de la unidad
         BigDecimal precioVehiculo = event.getPrecioVehiculo();
-        if (precioVehiculo == null && event.getVehiculoId() != null) {
+        if (precioVehiculo == null && event.getVehiculoId() != null && !event.getVehiculoId().isBlank()) {
             precioVehiculo = vehiculosPort.obtenerPrecioVehiculo(event.getVehiculoId()).orElse(null);
             log.info("Precio de vehículo {} obtenido por puerto: {}", event.getVehiculoId(), precioVehiculo);
         }
 
         // 2. Resolver situación crediticia si solicita financiación
         Integer situacionCrediticia = event.getSituacionCrediticia();
-        if (event.isSolicitaFinanciacion() && situacionCrediticia == null && event.getClienteId() != null) {
+        if (event.isSolicitaFinanciacion() && situacionCrediticia == null && event.getClienteId() != null && !event.getClienteId().isBlank()) {
             situacionCrediticia = situacionCrediticiaPort.obtenerSituacionCrediticia(event.getClienteId()).orElse(null);
             log.info("Situación crediticia de cliente {} obtenida por puerto: {}", event.getClienteId(), situacionCrediticia);
         }
@@ -59,6 +59,7 @@ public class CalificacionFacade {
         // 3. Armar datos de negocio para el motor
         DatosNegocio datos = DatosNegocio.builder()
                 .leadId(event.getLeadId())
+                .clienteId(event.getClienteId())
                 .vehiculoId(event.getVehiculoId())
                 .precioVehiculo(precioVehiculo)
                 .montoAnticipo(event.getMontoAnticipo())
@@ -83,6 +84,7 @@ public class CalificacionFacade {
 
         Calificacion calificacion = Calificacion.builder()
                 .leadId(event.getLeadId())
+                .clienteId(event.getClienteId())
                 .puntos(resultado.getPuntosTotales())
                 .nivel(resultado.getNivel())
                 .origen(OrigenCalificacion.AUTOMATICA)
@@ -106,14 +108,19 @@ public class CalificacionFacade {
     }
 
     @Transactional
-    public Calificacion corregirManualmente(Long leadId, CorreccionManualRequest request) {
-        if (leadId == null) {
+    public Calificacion corregirManualmente(String leadId, CorreccionManualRequest request) {
+        if (leadId == null || leadId.isBlank()) {
             throw new IllegalArgumentException("El leadId es obligatorio para una corrección manual");
         }
 
         log.info("Realizando corrección manual para leadId: {} a nuevo nivel: {}", leadId, request.getNuevoNivel());
 
-        // Determinar puntos: si se proveen en el request se usan, sino se asignan puntos acordes al nuevo nivel
+        // Recuperar clienteId previo si existía
+        String clienteIdPrevio = persistencePort.buscarUltimaPorLeadId(leadId)
+                .map(Calificacion::getClienteId)
+                .orElse(null);
+
+        // Determinar puntos
         int puntos;
         if (request.getPuntos() != null) {
             puntos = request.getPuntos();
@@ -137,6 +144,7 @@ public class CalificacionFacade {
 
         Calificacion calificacionManual = Calificacion.builder()
                 .leadId(leadId)
+                .clienteId(clienteIdPrevio)
                 .puntos(puntos)
                 .nivel(request.getNuevoNivel())
                 .origen(OrigenCalificacion.MANUAL)
@@ -155,13 +163,13 @@ public class CalificacionFacade {
     }
 
     @Transactional(readOnly = true)
-    public Calificacion obtenerUltimaPorLeadId(Long leadId) {
+    public Calificacion obtenerUltimaPorLeadId(String leadId) {
         return persistencePort.buscarUltimaPorLeadId(leadId)
                 .orElseThrow(() -> new EntityNotFoundException("No se encontró ninguna calificación para el lead " + leadId));
     }
 
     @Transactional(readOnly = true)
-    public List<Calificacion> obtenerHistorialPorLeadId(Long leadId) {
+    public List<Calificacion> obtenerHistorialPorLeadId(String leadId) {
         return persistencePort.buscarHistorialPorLeadId(leadId);
     }
 }

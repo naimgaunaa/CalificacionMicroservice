@@ -19,8 +19,11 @@ import java.util.List;
 @Schema(description = "Evento de integración emitido en Kafka cuando un lead ha sido calificado")
 public class LeadCalificadoEvent {
 
-    @Schema(description = "ID del Lead", example = "1001")
-    private Long leadId;
+    @Schema(description = "ID del Lead (UUID)", example = "550e8400-e29b-41d4-a716-446655440000")
+    private String leadId;
+
+    @Schema(description = "ID del Cliente (UUID) asociado para registrar en su historial", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    private String clienteId;
 
     @Schema(description = "Puntaje final asignado", example = "60")
     private Integer puntos;

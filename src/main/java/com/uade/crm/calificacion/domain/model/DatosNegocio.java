@@ -12,8 +12,9 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DatosNegocio {
-    private Long leadId;
-    private Long vehiculoId;
+    private String leadId;
+    private String clienteId;
+    private String vehiculoId;
     private BigDecimal precioVehiculo;
     private BigDecimal montoAnticipo;
     private BigDecimal montoPermuta;

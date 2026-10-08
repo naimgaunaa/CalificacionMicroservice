@@ -9,7 +9,7 @@ import java.util.Optional;
 @Repository
 public interface CalificacionRepository extends JpaRepository<CalificacionEntity, Long> {
 
-    Optional<CalificacionEntity> findTopByLeadIdOrderByFechaCalculoDesc(Long leadId);
+    Optional<CalificacionEntity> findTopByLeadIdOrderByFechaCalculoDesc(String leadId);
 
-    List<CalificacionEntity> findByLeadIdOrderByFechaCalculoDesc(Long leadId);
+    List<CalificacionEntity> findByLeadIdOrderByFechaCalculoDesc(String leadId);
 }

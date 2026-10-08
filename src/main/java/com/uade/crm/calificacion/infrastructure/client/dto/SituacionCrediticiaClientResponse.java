@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SituacionCrediticiaClientResponse {
-    private Long clienteId;
+    private String clienteId;
     private Integer situacionCrediticia;
     private Integer situacionBcra;
     private String observacion;

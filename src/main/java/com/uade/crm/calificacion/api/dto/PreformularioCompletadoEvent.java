@@ -16,14 +16,14 @@ import java.time.LocalDateTime;
 @Schema(description = "Evento emitido al completar un preformulario de interés vehicular")
 public class PreformularioCompletadoEvent {
 
-    @Schema(description = "ID único del lead", example = "1001")
-    private Long leadId;
+    @Schema(description = "ID único del lead (UUID)", example = "550e8400-e29b-41d4-a716-446655440000")
+    private String leadId;
 
-    @Schema(description = "ID del cliente", example = "501")
-    private Long clienteId;
+    @Schema(description = "ID del cliente (UUID)", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    private String clienteId;
 
-    @Schema(description = "ID del vehículo seleccionado", example = "2005")
-    private Long vehiculoId;
+    @Schema(description = "ID del vehículo seleccionado (UUID)", example = "7c9e6679-7425-40de-944b-e07fc1f90ae7")
+    private String vehiculoId;
 
     @Schema(description = "Precio del vehículo (si está disponible directamente en el evento)", example = "10000000.00")
     private BigDecimal precioVehiculo;

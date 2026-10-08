@@ -21,8 +21,8 @@ public class SituacionCrediticiaRestClientAdapter implements SituacionCrediticia
     }
 
     @Override
-    public Optional<Integer> obtenerSituacionCrediticia(Long clienteId) {
-        if (clienteId == null) {
+    public Optional<Integer> obtenerSituacionCrediticia(String clienteId) {
+        if (clienteId == null || clienteId.isBlank()) {
             return Optional.empty();
         }
 

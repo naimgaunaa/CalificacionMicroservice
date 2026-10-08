@@ -38,8 +38,8 @@ public class CalificacionController {
     })
     @GetMapping("/{leadId}")
     public ResponseEntity<CalificacionResponse> obtenerUltimaCalificacion(
-            @Parameter(description = "ID del Lead", example = "1001", required = true)
-            @PathVariable Long leadId) {
+            @Parameter(description = "ID del Lead (UUID o identificador)", example = "550e8400-e29b-41d4-a716-446655440000", required = true)
+            @PathVariable String leadId) {
         Calificacion calificacion = calificacionFacade.obtenerUltimaPorLeadId(leadId);
         return ResponseEntity.ok(toResponse(calificacion));
     }
@@ -50,8 +50,8 @@ public class CalificacionController {
     })
     @GetMapping("/{leadId}/historial")
     public ResponseEntity<List<CalificacionResponse>> obtenerHistorial(
-            @Parameter(description = "ID del Lead", example = "1001", required = true)
-            @PathVariable Long leadId) {
+            @Parameter(description = "ID del Lead (UUID o identificador)", example = "550e8400-e29b-41d4-a716-446655440000", required = true)
+            @PathVariable String leadId) {
         List<Calificacion> historial = calificacionFacade.obtenerHistorialPorLeadId(leadId);
         List<CalificacionResponse> responses = historial.stream()
                 .map(this::toResponse)
@@ -67,8 +67,8 @@ public class CalificacionController {
     })
     @PostMapping("/{leadId}/correcciones")
     public ResponseEntity<CalificacionResponse> realizarCorreccionManual(
-            @Parameter(description = "ID del Lead", example = "1001", required = true)
-            @PathVariable Long leadId,
+            @Parameter(description = "ID del Lead (UUID o identificador)", example = "550e8400-e29b-41d4-a716-446655440000", required = true)
+            @PathVariable String leadId,
             @Valid @RequestBody CorreccionManualRequest request) {
         Calificacion calificacion = calificacionFacade.corregirManualmente(leadId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(calificacion));
@@ -90,6 +90,7 @@ public class CalificacionController {
         return CalificacionResponse.builder()
                 .id(domain.getId())
                 .leadId(domain.getLeadId())
+                .clienteId(domain.getClienteId())
                 .puntos(domain.getPuntos())
                 .nivel(domain.getNivel())
                 .origen(domain.getOrigen())

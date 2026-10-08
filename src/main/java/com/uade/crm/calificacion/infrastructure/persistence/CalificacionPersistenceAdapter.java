@@ -27,14 +27,14 @@ public class CalificacionPersistenceAdapter implements CalificacionPersistencePo
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Calificacion> buscarUltimaPorLeadId(Long leadId) {
+    public Optional<Calificacion> buscarUltimaPorLeadId(String leadId) {
         return repository.findTopByLeadIdOrderByFechaCalculoDesc(leadId)
                 .map(this::toDomain);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Calificacion> buscarHistorialPorLeadId(Long leadId) {
+    public List<Calificacion> buscarHistorialPorLeadId(String leadId) {
         return repository.findByLeadIdOrderByFechaCalculoDesc(leadId).stream()
                 .map(this::toDomain)
                 .toList();
@@ -58,6 +58,7 @@ public class CalificacionPersistenceAdapter implements CalificacionPersistencePo
         return CalificacionEntity.builder()
                 .id(domain.getId())
                 .leadId(domain.getLeadId())
+                .clienteId(domain.getClienteId())
                 .puntos(domain.getPuntos())
                 .nivel(domain.getNivel())
                 .origen(domain.getOrigen())
@@ -85,6 +86,7 @@ public class CalificacionPersistenceAdapter implements CalificacionPersistencePo
         return Calificacion.builder()
                 .id(entity.getId())
                 .leadId(entity.getLeadId())
+                .clienteId(entity.getClienteId())
                 .puntos(entity.getPuntos())
                 .nivel(entity.getNivel())
                 .origen(entity.getOrigen())

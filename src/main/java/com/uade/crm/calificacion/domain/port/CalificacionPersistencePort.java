@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface CalificacionPersistencePort {
     Calificacion guardar(Calificacion calificacion);
-    Optional<Calificacion> buscarUltimaPorLeadId(Long leadId);
-    List<Calificacion> buscarHistorialPorLeadId(Long leadId);
+    Optional<Calificacion> buscarUltimaPorLeadId(String leadId);
+    List<Calificacion> buscarHistorialPorLeadId(String leadId);
 }

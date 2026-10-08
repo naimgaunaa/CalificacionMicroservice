@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VehiculoClientResponse {
-    private Long id;
+    private String id;
     private String marca;
     private String modelo;
     private Integer anio;

@@ -12,6 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "calificaciones", indexes = {
         @Index(name = "idx_calificaciones_lead_id", columnList = "lead_id"),
+        @Index(name = "idx_calificaciones_cliente_id", columnList = "cliente_id"),
         @Index(name = "idx_calificaciones_fecha", columnList = "fecha_calculo")
 })
 @Getter
@@ -25,8 +26,11 @@ public class CalificacionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "lead_id", nullable = false)
-    private Long leadId;
+    @Column(name = "lead_id", nullable = false, length = 64)
+    private String leadId;
+
+    @Column(name = "cliente_id", length = 64)
+    private String clienteId;
 
     @Column(nullable = false)
     private Integer puntos;

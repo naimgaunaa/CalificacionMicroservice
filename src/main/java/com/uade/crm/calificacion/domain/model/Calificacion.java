@@ -15,7 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 public class Calificacion {
     private Long id;
-    private Long leadId;
+    private String leadId;
+    private String clienteId;
     private int puntos;
     private NivelCalificacion nivel;
     private OrigenCalificacion origen;

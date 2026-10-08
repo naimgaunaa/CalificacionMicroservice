@@ -19,11 +19,14 @@ import java.util.List;
 @Schema(description = "Respuesta con los datos de la calificación del lead")
 public class CalificacionResponse {
 
-    @Schema(description = "ID de la calificación", example = "10")
+    @Schema(description = "ID interno de la calificación", example = "10")
     private Long id;
 
-    @Schema(description = "ID del Lead calificado", example = "1001")
-    private Long leadId;
+    @Schema(description = "ID del Lead calificado (UUID)", example = "550e8400-e29b-41d4-a716-446655440000")
+    private String leadId;
+
+    @Schema(description = "ID del Cliente (UUID)", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    private String clienteId;
 
     @Schema(description = "Puntaje total obtenido", example = "60")
     private Integer puntos;

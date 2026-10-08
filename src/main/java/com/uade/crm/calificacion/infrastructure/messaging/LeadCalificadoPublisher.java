@@ -36,6 +36,7 @@ public class LeadCalificadoPublisher implements LeadCalificadoPublisherPort {
 
         LeadCalificadoEvent event = LeadCalificadoEvent.builder()
                 .leadId(calificacion.getLeadId())
+                .clienteId(calificacion.getClienteId())
                 .puntos(calificacion.getPuntos())
                 .nivel(calificacion.getNivel())
                 .origen(calificacion.getOrigen())
@@ -44,13 +45,13 @@ public class LeadCalificadoPublisher implements LeadCalificadoPublisherPort {
                 .motivos(motivosTexto)
                 .build();
 
-        String key = String.valueOf(calificacion.getLeadId());
+        String key = calificacion.getLeadId();
 
         kafkaTemplate.send(topicoLeadCalificado, key, event)
                 .whenComplete((result, ex) -> {
                     if (ex == null) {
-                        log.info("Evento LeadCalificado publicado exitosamente en {} [leadId: {}, nivel: {}, puntos: {}]",
-                                topicoLeadCalificado, event.getLeadId(), event.getNivel(), event.getPuntos());
+                        log.info("Evento LeadCalificado publicado exitosamente en {} [leadId: {}, clienteId: {}, nivel: {}, puntos: {}]",
+                                topicoLeadCalificado, event.getLeadId(), event.getClienteId(), event.getNivel(), event.getPuntos());
                     } else {
                         log.error("Fallo al publicar evento LeadCalificado en {} [leadId: {}]: {}",
                                 topicoLeadCalificado, event.getLeadId(), ex.getMessage());
