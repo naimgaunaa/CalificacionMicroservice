@@ -51,6 +51,206 @@ com.uade.crm.calificacion
 
 ---
 
+## 🧩 Patrones de Diseño Implementados
+
+El microservicio implementa **5 patrones de diseño orientados a objetos**, superando el mínimo requerido por la consigna del TPO:
+
+| Patrón | Dónde se aplica | Justificación técnica |
+|---|---|---|
+| **Strategy** | `ReglaCalificacion`, `ReglaCobertura`, `ReglaFinanciacion`, `ReglaUbicacion` | Permite evaluar criterios de scoring vehicular independientes e intercambiables. Incorporar nuevas reglas respeta el principio *Open/Closed* (OCP) sin modificar el motor. |
+| **Factory** | `MotorCalificacionFactory` | Centraliza la construcción y parametrización del motor con umbrales y puntos configurables (`application.yml`) o valores por defecto para pruebas unitarias. |
+| **Facade** | `CalificacionFacade` | Oculta la complejidad de orquestar puertos externos (`VehiculosPort`, `SituacionCrediticiaPort`), motor de scoring, persistencia JPA y publicación Kafka. |
+| **Observer** | `CalificacionCalculada` y `HistorialCalificacionListener` | Desacopla la auditoría y trazabilidad ante cada cálculo o corrección mediante eventos de aplicación de Spring y Kafka. |
+| **Repository** | `CalificacionRepository` y `CalificacionPersistencePort` | Aísla la capa de dominio puro del mapeo relacional de base de datos JPA/Hibernate. |
+
+### Diagrama de Clases UML
+
+```mermaid
+classDiagram
+    direction TB
+
+    class NivelCalificacion {
+        <<enumeration>>
+        MUY_POTABLE
+        POTABLE
+        NO_POTABLE
+    }
+
+    class OrigenCalificacion {
+        <<enumeration>>
+        AUTOMATICA
+        MANUAL
+    }
+
+    class Calificacion {
+        -Long id
+        -String leadId
+        -String clienteId
+        -int puntos
+        -NivelCalificacion nivel
+        -OrigenCalificacion origen
+        -LocalDateTime fechaCalculo
+        -String observacion
+        -List~MotivoCalificacion~ motivos
+    }
+
+    class MotivoCalificacion {
+        -String regla
+        -int puntos
+        -String descripcion
+    }
+
+    class DatosNegocio {
+        -String leadId
+        -String clienteId
+        -String vehiculoId
+        -BigDecimal precioVehiculo
+        -BigDecimal montoAnticipo
+        -BigDecimal montoPermuta
+        -boolean permutaNoComputable
+        -boolean solicitaFinanciacion
+        -Integer situacionCrediticia
+        -String ubicacion
+    }
+
+    class ReglaCalificacion {
+        <<interface>>
+        +evaluar(DatosNegocio datos) ResultadoRegla
+    }
+
+    class ReglaCobertura {
+        +evaluar(DatosNegocio datos) ResultadoRegla
+    }
+
+    class ReglaFinanciacion {
+        +evaluar(DatosNegocio datos) ResultadoRegla
+    }
+
+    class ReglaUbicacion {
+        +evaluar(DatosNegocio datos) ResultadoRegla
+    }
+
+    class MotorCalificacion {
+        -List~ReglaCalificacion~ reglas
+        -int umbralMuyPotable
+        -int umbralPotable
+        +calificar(DatosNegocio datos) ResultadoCalificacion
+        +determinarNivel(int puntosTotales) NivelCalificacion
+    }
+
+    class MotorCalificacionFactory {
+        +crearMotorDefault() MotorCalificacion
+        +crearMotor(List~ReglaCalificacion~ reglas, int umbralMuy, int umbralPot) MotorCalificacion
+    }
+
+    ReglaCalificacion <|.. ReglaCobertura : implements
+    ReglaCalificacion <|.. ReglaFinanciacion : implements
+    ReglaCalificacion <|.. ReglaUbicacion : implements
+    MotorCalificacion o-- ReglaCalificacion : Strategy
+    MotorCalificacionFactory ..> MotorCalificacion : Factory
+    Calificacion *-- MotivoCalificacion
+
+    class VehiculosPort {
+        <<interface>>
+        +obtenerPrecioVehiculo(String vehiculoId) Optional~BigDecimal~
+    }
+
+    class SituacionCrediticiaPort {
+        <<interface>>
+        +obtenerSituacionCrediticia(String clienteId) Optional~Integer~
+    }
+
+    class CalificacionPersistencePort {
+        <<interface>>
+        +guardar(Calificacion calificacion) Calificacion
+        +buscarUltimaPorLeadId(String leadId) Optional~Calificacion~
+        +buscarHistorialPorLeadId(String leadId) List~Calificacion~
+    }
+
+    class LeadCalificadoPublisherPort {
+        <<interface>>
+        +publicar(Calificacion calificacion) void
+    }
+
+    class CalificacionFacade {
+        -MotorCalificacion motorCalificacion
+        -VehiculosPort vehiculosPort
+        -SituacionCrediticiaPort situacionCrediticiaPort
+        -CalificacionPersistencePort persistencePort
+        -LeadCalificadoPublisherPort publisherPort
+        -ApplicationEventPublisher eventPublisher
+        +calificarLead(PreformularioCompletadoEvent event) Calificacion
+        +corregirManualmente(String leadId, CorreccionManualRequest req) Calificacion
+        +obtenerUltimaPorLeadId(String leadId) Calificacion
+    }
+
+    class CalificacionCalculada {
+        -String leadId
+        -String clienteId
+        -Calificacion calificacion
+        -LocalDateTime fecha
+    }
+
+    class HistorialCalificacionListener {
+        +onCalificacionCalculada(CalificacionCalculada event) void
+    }
+
+    CalificacionFacade --> MotorCalificacion : Facade
+    CalificacionFacade --> VehiculosPort
+    CalificacionFacade --> SituacionCrediticiaPort
+    CalificacionFacade --> CalificacionPersistencePort
+    CalificacionFacade --> LeadCalificadoPublisherPort
+    CalificacionFacade ..> CalificacionCalculada : emite
+    HistorialCalificacionListener ..> CalificacionCalculada : Observer
+
+    class VehiculosRestClientAdapter {
+        -RestClient vehiculosRestClient
+        +obtenerPrecioVehiculo(String id) Optional~BigDecimal~
+    }
+
+    class SituacionCrediticiaRestClientAdapter {
+        -RestClient clientesRestClient
+        +obtenerSituacionCrediticia(String id) Optional~Integer~
+    }
+
+    class CalificacionPersistenceAdapter {
+        -CalificacionRepository repository
+        +guardar(Calificacion c) Calificacion
+    }
+
+    class CalificacionRepository {
+        <<interface>>
+        +findTopByLeadIdOrderByFechaCalculoDesc(String leadId)
+    }
+
+    class LeadCalificadoPublisher {
+        -KafkaTemplate kafkaTemplate
+        +publicar(Calificacion c) void
+    }
+
+    VehiculosPort <|.. VehiculosRestClientAdapter
+    SituacionCrediticiaPort <|.. SituacionCrediticiaRestClientAdapter
+    CalificacionPersistencePort <|.. CalificacionPersistenceAdapter
+    CalificacionPersistenceAdapter --> CalificacionRepository : Repository
+    LeadCalificadoPublisherPort <|.. LeadCalificadoPublisher
+
+    class CalificacionController {
+        -CalificacionFacade calificacionFacade
+        +obtenerUltimaCalificacion(String leadId) ResponseEntity
+        +realizarCorreccionManual(String leadId, CorreccionManualRequest req) ResponseEntity
+    }
+
+    class PreformularioCompletadoListener {
+        -CalificacionFacade calificacionFacade
+        +escucharPreformulario(PreformularioCompletadoEvent event) void
+    }
+
+    CalificacionController --> CalificacionFacade
+    PreformularioCompletadoListener --> CalificacionFacade
+```
+
+---
+
 ## Reglas de Negocio y Scoring
 
 El motor evalúa 3 reglas principales (Strategy):
@@ -84,11 +284,13 @@ El motor evalúa 3 reglas principales (Strategy):
 
 | Método | Endpoint | Descripción |
 |---|---|---|
-| `GET` | `/calificaciones/{leadId}` | Obtiene la última calificación vigente del lead |
+| `GET` | `/calificaciones/{leadId}` | Obtiene la última calificación vigente del lead (con desglose de motivos) |
 | `GET` | `/calificaciones/{leadId}/historial` | Obtiene el historial completo de calificaciones del lead |
-| `POST` | `/calificaciones/{leadId}/correcciones` | Realiza una corrección manual (por asesor/comercial) |
+| `POST` | `/calificaciones/{leadId}/correcciones` | Realiza una corrección manual (por asesor/comercial) con nuevo nivel y motivo obligatorio |
 | `GET` | `/swagger-ui.html` | Interfaz interactiva Swagger UI |
 | `GET` | `/v3/api-docs` | Especificación OpenAPI 3.0 |
+
+*Nota:* Los identificadores (`leadId`) operan bajo formato **UUID**.
 
 ---
 
@@ -98,7 +300,8 @@ El motor evalúa 3 reglas principales (Strategy):
   - Escuchado por `PreformularioCompletadoListener`.
   - Si el evento no contiene precio del vehículo o situación crediticia, el servicio los consulta dinámicamente mediante `VehiculosPort` y `SituacionCrediticiaPort`.
 - **Tópico de Salida**: `lead-calificado`
-  - Emitido por `LeadCalificadoPublisher` luego de persistir la calificación en base de datos.
+  - Emitido por `LeadCalificadoPublisher` tras persistir la calificación en PostgreSQL.
+  - Incluye `leadId`, `clienteId`, `puntos`, `nivel`, `origen`, `motivos[]` y fecha para que el microservicio de `clientes` registre el historial del cliente.
 - **Dead Letter Topic (DLT)**: `preformulario-completado-dlt` con reintentos automáticos configurados.
 
 ---
