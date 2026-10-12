@@ -36,7 +36,7 @@ public class PreformularioCompletadoListener {
             event = parse(mensaje);
         } catch (Exception ex) {
             log.error("No se pudo interpretar el mensaje de preformulario-completado: {}", ex.getMessage(), ex);
-            throw ex; // reintenta o va a DLT
+            throw new RuntimeException("No se pudo interpretar el mensaje de preformulario-completado", ex); // reintenta o va a DLT
         }
 
         if (event.getLeadId() == null) {
@@ -51,7 +51,7 @@ public class PreformularioCompletadoListener {
         } catch (Exception ex) {
             log.error("Error al procesar el evento de preformulario completado para leadId: {}: {}",
                     event.getLeadId(), ex.getMessage(), ex);
-            throw ex; // Permite que el ErrorHandler de Kafka reintente o mande a DLT
+            throw new RuntimeException("Error al procesar el evento de preformulario completado", ex); // Permite que el ErrorHandler de Kafka reintente o mande a DLT
         }
     }
 
