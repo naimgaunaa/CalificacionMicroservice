@@ -38,9 +38,8 @@ spring:
     #   SPRING_KAFKA_PROPERTIES_SASL_MECHANISM=SCRAM-SHA-256
     #   SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG=...
     ssl:
-      trust-store-location: file:client.truststore.jks
-      trust-store-password: ${KAFKA_TRUSTSTORE_PASSWORD}
-      trust-store-type: JKS
+      trust-store-location: file:ca.pem
+      trust-store-type: PEM
     consumer:
       group-id: calificacion-group
       auto-offset-reset: earliest
