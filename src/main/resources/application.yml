@@ -23,13 +23,17 @@ spring:
 
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    # SASL/SSL (Aiven) se configura por variables en el despliegue:
+    #   SPRING_KAFKA_PROPERTIES_SECURITY_PROTOCOL=SASL_SSL
+    #   SPRING_KAFKA_PROPERTIES_SASL_MECHANISM=SCRAM-SHA-256
+    #   SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG=...
     consumer:
       group-id: calificacion-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "*"
+      # El productor (leads, Python) publica JSON plano sin headers de tipo. Se
+      # consume como String y se parsea manualmente en el listener (sobre o payload).
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -39,6 +43,9 @@ crm:
   servicios:
     clientes:
       url: ${CLIENTES_SERVICE_URL:http://localhost:8082}
+      # Clave que clientes exige en X-Api-Key para GET /clientes/{id}/situacion-crediticia
+      # (debe coincidir con CLIENTES_CLAVE_CALIFICACION en clientes).
+      clave-calificacion: ${CLIENTES_CLAVE_CALIFICACION:}
     vehiculos:
       url: ${VEHICULOS_SERVICE_URL:http://localhost:8083}
   kafka:
