@@ -311,8 +311,10 @@ El motor evalúa 3 reglas principales (Strategy):
 Para ejecutar la suite de pruebas:
 
 ```bash
-mvn test
+./mvnw test        # Windows: mvnw.cmd test
 ```
+
+El repo trae el **Maven Wrapper** (`mvnw`): no hace falta tener Maven instalado, solo JDK 21. La primera vez descarga Maven 3.9.16 (verificando su SHA-256) en `~/.m2/wrapper`. La versión se define en `.mvn/wrapper/maven-wrapper.properties`.
 
 La clase `MotorCalificacionTest` verifica los 9 casos de referencia sobre una unidad de $10.000.000:
 1. Anticipo 3M, permuta 3M, BA, sin financiación -> 60 pts (`MUY_POTABLE`)
