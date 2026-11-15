@@ -1,5 +1,6 @@
 package com.uade.crm.calificacion.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.uade.crm.calificacion.domain.model.NivelCalificacion;
 import com.uade.crm.calificacion.domain.model.OrigenCalificacion;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -34,7 +35,10 @@ public class LeadCalificadoEvent {
     @Schema(description = "Origen de la calificación", example = "AUTOMATICA")
     private OrigenCalificacion origen;
 
-    @Schema(description = "Fecha y hora del evento")
+    // STRING fuerza ISO-8601 ("2026-11-14T18:56:06.049848900"). Sin esto, el JsonSerializer de Spring Kafka
+    // escribe el LocalDateTime como array ([2026,11,14,18,56,6,...]) y clientes lo rechaza (va a su DLT).
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @Schema(description = "Fecha y hora del evento (ISO-8601, sin zona)", example = "2026-10-11T15:30:00")
     private LocalDateTime fecha;
 
     @Schema(description = "Observación o motivo")
