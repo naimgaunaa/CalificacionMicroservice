@@ -53,6 +53,11 @@ spring:
 
 # Configuración del ecosistema CRM
 crm:
+  orquestador:
+    # Credencial de calificacion ante el orquestador (API Gateway): la clave de "calificacion" en el
+    # CLAVES_SERVICIO del orquestador (32+ caracteres). Obligatoria si las URLs de clientes y vehiculos
+    # apuntan al orquestador (<orquestador>/api); vacia si se llama directo a los servicios.
+    clave-servicio: ${ORQUESTADOR_CLAVE_SERVICIO:}
   servicios:
     clientes:
       url: ${CLIENTES_SERVICE_URL:http://localhost:8082}

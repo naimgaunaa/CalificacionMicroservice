@@ -69,7 +69,14 @@ public class CalificacionController {
     public ResponseEntity<CalificacionResponse> realizarCorreccionManual(
             @Parameter(description = "ID del Lead (UUID o identificador)", example = "550e8400-e29b-41d4-a716-446655440000", required = true)
             @PathVariable String leadId,
+            @Parameter(description = "Operador autenticado. Lo agrega el orquestador a partir del JWT; si viene, "
+                    + "reemplaza al campo 'usuario' del body", hidden = true)
+            @RequestHeader(value = "X-Usuario", required = false) String usuarioAutenticado,
             @Valid @RequestBody CorreccionManualRequest request) {
+        if (usuarioAutenticado != null && !usuarioAutenticado.isBlank()) {
+            // La identidad la valida el orquestador; el "usuario" del body lo puede escribir cualquiera.
+            request.setUsuario(usuarioAutenticado.trim());
+        }
         Calificacion calificacion = calificacionFacade.corregirManualmente(leadId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(calificacion));
     }
