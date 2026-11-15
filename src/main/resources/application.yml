@@ -88,6 +88,17 @@ crm:
       - CIUDAD_AUTONOMA_DE_BUENOS_AIRES
       - PROVINCIA_DE_BUENOS_AIRES
 
+# Solo health (estado del servicio y de su base). El resto de los endpoints de Actuator no se exponen.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
 springdoc:
   api-docs:
     path: /v3/api-docs
