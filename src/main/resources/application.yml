@@ -68,9 +68,10 @@ crm:
       url: ${VEHICULOS_SERVICE_URL:http://localhost:8083}
   kafka:
     topicos:
-      preformulario-completado: preformulario-completado
-      lead-calificado: lead-calificado
-      preformulario-dlt: preformulario-completado-dlt
+      # Los tres tópicos del ecosistema (docs/08-contrato-tres-topicos.md del orquestador).
+      comandos: ${KAFKA_TOPICO_COMANDOS:crm.comandos}
+      eventos: ${KAFKA_TOPICO_EVENTOS:crm.eventos}
+      dlt: ${KAFKA_TOPICO_DLT:crm.dlt}
   reglas:
     puntos:
       cobertura-alta: 60

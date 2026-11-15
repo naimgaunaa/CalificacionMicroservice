@@ -24,9 +24,9 @@ crm:
       url: http://localhost:8083
   kafka:
     topicos:
-      preformulario-completado: preformulario-completado
-      lead-calificado: lead-calificado
-      preformulario-dlt: preformulario-completado-dlt
+      comandos: crm.comandos
+      eventos: crm.eventos
+      dlt: crm.dlt
   reglas:
     puntos:
       cobertura-alta: 60

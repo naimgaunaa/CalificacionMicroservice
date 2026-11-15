@@ -296,13 +296,14 @@ El motor evalúa 3 reglas principales (Strategy):
 
 ## Integración Kafka
 
-- **Tópico de Entrada**: `preformulario-completado`
-  - Escuchado por `PreformularioCompletadoListener`.
-  - Si el evento no contiene precio del vehículo o situación crediticia, el servicio los consulta dinámicamente mediante `VehiculosPort` y `SituacionCrediticiaPort`.
-- **Tópico de Salida**: `lead-calificado`
-  - Emitido por `LeadCalificadoPublisher` tras persistir la calificación en PostgreSQL.
-  - Incluye `leadId`, `clienteId`, `puntos`, `nivel`, `origen`, `motivos[]` y fecha para que el microservicio de `clientes` registre el historial del cliente.
-- **Dead Letter Topic (DLT)**: `preformulario-completado-dlt` con reintentos automáticos configurados.
+Contrato completo: `docs/08-contrato-tres-topicos.md` del orquestador. Calificacion habla con el orquestador, no con otros servicios.
+
+- **Comandos** (`crm.comandos`, variable `KAFKA_TOPICO_COMANDOS`): escuchado por `CalificarLeadListener`, que atiende el comando `CalificarLead` con `destino: calificacion` e ignora los demás.
+  - El payload es el del evento `PreformularioCompletado` que publicó leads. Si no contiene precio del vehículo o situación crediticia, el servicio los consulta dinámicamente mediante `VehiculosPort` y `SituacionCrediticiaPort`.
+- **Eventos** (`crm.eventos`, variable `KAFKA_TOPICO_EVENTOS`): `LeadCalificadoPublisher` publica el evento `LeadCalificado` dentro del sobre común (`eventId`, `eventType`, `version`, `occurredAt`, `timestamp`, `correlationId`, `payload`) tras persistir la calificación en PostgreSQL.
+  - El `payload` incluye `leadId`, `clienteId`, `puntos`, `nivel`, `origen`, `motivos[]` y fecha. Lo lee el orquestador, que ordena registrarlo en `clientes` y `leads`.
+  - Lleva el `correlationId` del comando que lo originó; una corrección manual por REST no tiene comando de origen y genera uno nuevo.
+- **Dead Letter Topic** (`crm.dlt`, variable `KAFKA_TOPICO_DLT`): el comando que falla 3 veces (1 s entre intentos) se manda tal cual, con su sobre, a la DLT.
 
 ---
 
