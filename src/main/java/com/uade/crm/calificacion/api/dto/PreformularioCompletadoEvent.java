@@ -46,6 +46,9 @@ public class PreformularioCompletadoEvent {
     @Schema(description = "Ubicación o provincia del solicitante", example = "BUENOS_AIRES")
     private String ubicacion;
 
+    @Schema(description = "Patente del vehículo en parte de pago informada por el prospecto", example = "AB123CD")
+    private String patente;
+
     @Schema(description = "Marca o modelo del vehículo de interés", example = "Toyota Corolla")
     private String vehiculoDescripcion;
 

@@ -103,6 +103,7 @@ public class CalificarLeadListener {
         boolean solicitaFinanciacion = datos.path("solicitaFinanciacion").asBoolean(false);
         String ubicacion = datos.path("ubicacion").isTextual() ? datos.get("ubicacion").asText()
                 : (datos.path("provincia").isTextual() ? datos.get("provincia").asText() : null);
+        String patente = datos.path("patente").isTextual() ? datos.get("patente").asText() : null;
 
         return PreformularioCompletadoEvent.builder()
                 .leadId(texto(datos, "leadId"))
@@ -113,6 +114,7 @@ public class CalificarLeadListener {
                 .permutaNoComputable(noComputable)
                 .solicitaFinanciacion(solicitaFinanciacion)
                 .ubicacion(ubicacion)
+                .patente(patente)
                 .build();
     }
 

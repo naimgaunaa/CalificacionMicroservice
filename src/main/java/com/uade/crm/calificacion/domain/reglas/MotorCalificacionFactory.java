@@ -8,7 +8,8 @@ public class MotorCalificacionFactory {
         return new MotorCalificacion(List.of(
                 new ReglaCobertura(),
                 new ReglaFinanciacion(),
-                new ReglaUbicacion()
+                new ReglaUbicacion(),
+                new ReglaMultas()
         ));
     }
 
