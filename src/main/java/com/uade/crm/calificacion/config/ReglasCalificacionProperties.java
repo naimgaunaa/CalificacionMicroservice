@@ -26,6 +26,7 @@ public class ReglasCalificacionProperties {
         private int financiacionBuena = 20;
         private int financiacionMala = -25;
         private int ubicacionFueraZona = -25;
+        private int multas = -25;
     }
 
     @Data

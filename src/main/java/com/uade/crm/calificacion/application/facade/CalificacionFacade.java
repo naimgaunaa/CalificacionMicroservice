@@ -68,6 +68,7 @@ public class CalificacionFacade {
                 .solicitaFinanciacion(event.isSolicitaFinanciacion())
                 .situacionCrediticia(situacionCrediticia)
                 .ubicacion(event.getUbicacion())
+                .patente(event.getPatente())
                 .build();
 
         // 4. Evaluar con el motor de reglas

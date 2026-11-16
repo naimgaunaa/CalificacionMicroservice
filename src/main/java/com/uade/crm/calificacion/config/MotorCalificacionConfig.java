@@ -29,8 +29,12 @@ public class MotorCalificacionConfig {
                 properties.getZonasAdmitidas()
         );
 
+        ReglaMultas reglaMultas = new ReglaMultas(
+                properties.getPuntos().getMultas()
+        );
+
         return MotorCalificacionFactory.crearMotor(
-                List.of(reglaCobertura, reglaFinanciacion, reglaUbicacion),
+                List.of(reglaCobertura, reglaFinanciacion, reglaUbicacion, reglaMultas),
                 properties.getUmbrales().getNivelMuyPotable(),
                 properties.getUmbrales().getNivelPotable()
         );

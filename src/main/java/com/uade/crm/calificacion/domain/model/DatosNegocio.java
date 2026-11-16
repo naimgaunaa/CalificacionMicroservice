@@ -22,6 +22,9 @@ public class DatosNegocio {
     private boolean solicitaFinanciacion;
     private Integer situacionCrediticia;
     private String ubicacion;
+    private String patente;
+    private Boolean tieneMultas;
+    private Integer cantidadMultas;
 
     public BigDecimal getMontoAnticipoSeguro() {
         return montoAnticipo != null ? montoAnticipo : BigDecimal.ZERO;
